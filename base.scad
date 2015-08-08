@@ -6,28 +6,36 @@ $fa=3;
 base_diameter=280;
 pole_diameter=40;
 thickness=2; // Thickness of all aluminum parts.
+bevel=10; // The size of the bevel in mm.
 
 floor_piece(thickness=thickness, height=80, diameter=base_diameter);
 translate([0,0,80])
-    base_cap(thickness=thickness, height=50, diameter=base_diameter);
+    base_cap(thickness=thickness, bevel=bevel, lip=10, diameter=base_diameter);
 
 // Modules related to the floor piece.
 
-module base_cap(thickness, height, diameter) {
-    // 1/8 of the thickness comes from lowering the cone
-    thickness=thickness*7/8;
+module base_cap(thickness, bevel, lip, diameter) {
+    // Start with the basic lid.
     difference() {
-        union() {
-            translate([0, 0, thickness])
-                cylinder(height, diameter, 0);
-            cylinder(thickness, diameter, diameter);
+        minkowski() {
+            cylinder(thickness, diameter-bevel, diameter-bevel);
+            sphere(bevel);
         }
-        // lower the cone.
-        translate([0,0,-thickness/8])
-            cylinder(height, diameter, 0);
-        // room for the pole
-        cylinder(height+thickness*2, pole_diameter, pole_diameter);
+        // Take off the bottom half
+        translate([0,0,-bevel-1])
+            cylinder(bevel+1, diameter+1, diameter+1);
+        // Cut out the inside.
+        translate([0,0,-1])
+            cylinder(bevel+1-thickness, diameter-thickness*2, diameter-bevel-thickness);
+        cylinder(bevel+thickness+1, pole_diameter, pole_diameter);
     }
+    // Create the lip.
+    translate([0,0,-lip+1])
+        difference() {
+            cylinder(lip+1, diameter-thickness, diameter-thickness);
+            translate([0,0,-1])
+                cylinder(lip+3, diameter-thickness*2, diameter-thickness*2);
+        }
 }
 
 module floor_piece(thickness, height, diameter) {
