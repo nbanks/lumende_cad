@@ -5,7 +5,7 @@ $fs=1;
 
 include<globals.scad>
 
-height=60;
+height=top_height;
 main_led_radius=20;
 miniled_radius=2.5;
 
@@ -17,13 +17,14 @@ module top() {
 }
 
 module top_shell() {
-    difference() {
-        top_shape(top_radius);
-        translate([0,0,wall_thickness])
-            top_shape(top_radius-wall_thickness);
-        translate([0,0,height+bevel])
-            cube([top_radius*3,top_radius*3,bevel*2],center=true);
-    }
+    color(aluminium)
+        difference() {
+            top_shape(top_radius);
+            translate([0,0,wall_thickness])
+                top_shape(top_radius-wall_thickness);
+            translate([0,0,height+bevel])
+                cube([top_radius*3,top_radius*3,bevel*2],center=true);
+        }
 }
 
 module top_shape(radius) {
@@ -35,22 +36,24 @@ module top_shape(radius) {
 }
 
 module heatsink(height) {
-    intersection() {
-        // Cut out any beveled edges.
-        top_shape(top_radius);
-        union() {
-            // Draw a bunch of fins & miniLED's
-            for(r=[0:num_fins]) {
-                rotate(360*r/num_fins) {
-                    // The fin
-                    cube([fin_thickness, top_radius, height]);
-                    // A mini LED.
-                    translate([fin_thickness/2, main_led_radius*2, 0]) {
-                        cylinder(height, miniled_radius, miniled_radius);
+    color(aluminium) {
+        intersection() {
+            // Cut out any beveled edges.
+            top_shape(top_radius);
+            union() {
+                // Draw a bunch of fins & miniLED's
+                for(r=[0:num_fins]) {
+                    rotate(360*r/num_fins) {
+                        // The fin
+                        cube([fin_thickness, top_radius, height]);
+                        // A mini LED.
+                        translate([fin_thickness/2, main_led_radius*2, 0]) {
+                            cylinder(height, miniled_radius, miniled_radius);
+                        }
                     }
                 }
+                cylinder(height, main_led_radius, main_led_radius);
             }
-            cylinder(height, main_led_radius, main_led_radius);
         }
     }
 }

@@ -7,8 +7,9 @@ include<globals.scad>
 base();
 
 module base() {
-    floor_piece(thickness=wall_thickness, height=50, radius=base_radius);
-    translate([0,0,50])
+    height=base_height-wall_thickness-bevel;
+    floor_piece(thickness=wall_thickness, height=height, radius=base_radius);
+    translate([0,0,height])
         base_cap(thickness=wall_thickness, bevel=bevel, lip=3, radius=base_radius);
 }
 
