@@ -12,7 +12,7 @@ miniled_radius=2.5;
 top();
 
 module top() {
-    heatsink(height-10);
+    full_heatsink(height-10);
     top_shell();
 }
 
@@ -35,26 +35,59 @@ module top_shape(radius) {
         }
 }
 
-module heatsink(height) {
+module full_heatsink(height) {
     color(aluminium) {
         intersection() {
-            // Cut out any beveled edges.
-            top_shape(top_radius);
-            union() {
-                // Draw a bunch of fins & miniLED's
-                for(r=[0:num_fins]) {
-                    rotate(360*r/num_fins) {
-                        // The fin
-                        cube([fin_thickness, top_radius, height]);
-                        // A mini LED.
-                        translate([fin_thickness/2, main_led_radius*2, 0]) {
-                            cylinder(height, miniled_radius, miniled_radius);
+            // Cut out any beveled edges./
+            top_shape(top_radius - wall_thickness/2);
+            if (num_leds==1) {
+                mini_heatsink(height);
+            } else {
+                for(i=[0:num_leds]) {
+                    rotate(360*i/num_leds)
+                        intersection() {
+                            // This creates a prism wedge of the appropriate angle.
+                            x=sin(180/num_leds)*top_radius*3;
+                            y=cos(180/num_leds)*top_radius*3;
+                            translate([0,0,-5]) {
+                                linear_extrude(height+10) {
+                                    // The pollygon's off because the polygon mesh
+                                    // export likes a little overlap on the faces.
+                                    polygon([[0,0],[-x-0.01,y],[0,top_radius*3],[x+0.01,y]]);
+                                }
+                            }
+                            // Offset by a certain amount
+                            translate([0, led_offset, 0])
+                                mini_heatsink(height);
                         }
-                    }
                 }
-                cylinder(height, main_led_radius, main_led_radius);
             }
         }
+    }
+}
+
+module mini_heatsink(height) {
+    // The space between the center and mini LED's
+    miniled_offset=45;
+
+    union() {
+        // Draw a bunch of fins & miniLED's
+        for(r=[0:num_fins]) {
+            rotate(360*r/num_fins) {
+                // The fin
+                translate([-fin_thickness/2, miniled_offset, 0]) {
+                    cube([fin_thickness, top_radius, height]);
+                }
+                // A mini LED.
+                translate([0, miniled_offset, 0]) {
+                    cylinder(height, miniled_radius, miniled_radius);
+                }
+                translate([-fin_thickness, 0, 0]) {
+                    cube([fin_thickness*2, miniled_offset, height]);
+                }
+            }
+        }
+        cylinder(height, main_led_radius, main_led_radius);
     }
 }
 
