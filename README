@@ -1,0 +1,9 @@
+These are the OpenSCAD design files for the Lumendé lamp.
+Our goal is to cast the lamp parts in alunimum.  The prototypes
+will use lost PLA casting, and the final design will use die
+cast alunimum.
+
+This repository does not contain any of the firmware or circuitry
+required to make the lamp operate.
+
+For more information, see lumende.com

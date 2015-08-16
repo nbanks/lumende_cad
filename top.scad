@@ -1,4 +1,4 @@
-// The base of the lumende lamp.
+// The top & heatsink of the lumende lamp.
 
 $fa=3;
 $fs=1;
